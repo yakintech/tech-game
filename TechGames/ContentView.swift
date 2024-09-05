@@ -8,16 +8,32 @@ import SwiftUI
 
 struct ContentView: View {
     
+    @State var maxScore : Int = 0
+    @State var totalGames : Int = 0
     @State var point : Int = 0
     
-    var colors: [Color] = [.red, .green, .yellow, .orange, .blue, .black]
+    var colors: [Color] = [.red, .green, .yellow, .blue]
     @State var focusColor: Color = .black
     
-    var colorsText: [String] = ["Red", "Green", "Yellow", "Orange", "Blue", "Black"]
+    var colorsText: [String] = ["Red", "Green", "Yellow", "Blue"]
     @State var focusColorText: String = ""
     
     var body: some View {
         VStack{
+            
+            Button("Reset Game Data"){
+                UserDefaults.standard.removeObject(forKey: "totalGames")
+                UserDefaults.standard.removeObject(forKey: "max")
+                totalGames = 0
+                maxScore = 0
+            }
+            
+            Text("Total Games: \(totalGames)")
+                .padding()
+            
+            Text("Max Score: \(maxScore)")
+                .padding()
+                .font(.title)
             
             Text(String(point))
                 .font(.largeTitle)
@@ -34,11 +50,19 @@ struct ContentView: View {
                 Button("True") {
                     if checkColorMatch() {
                         point = point + 5
+                        
+                        if(point > maxScore){
+                            maxScore = point
+                            UserDefaults.standard.set(maxScore, forKey: "max")
+                        }
+                        
                     } else {
-                        point = point - 10
+                        point = 0
+                        totalGames = totalGames + 1
+                        UserDefaults.standard.set(totalGames, forKey: "totalGames")
                     }
-                    
                     selectNewColor()
+                    
                 }
                 .font(.largeTitle)
                 .foregroundColor(.black)
@@ -47,8 +71,16 @@ struct ContentView: View {
                 Button("False") {
                     if !checkColorMatch() {
                         point = point + 5
+                        
+                        if(point > maxScore){
+                            maxScore = point
+                            UserDefaults.standard.set(maxScore, forKey: "max")
+                        }
+                        
                     } else {
-                        point = point - 10
+                        point = 0
+                        totalGames = totalGames + 1
+                        UserDefaults.standard.set(totalGames, forKey: "totalGames")
                     }
                     
                     selectNewColor()
@@ -62,6 +94,9 @@ struct ContentView: View {
         .onAppear() {
             // Random olarak colors dizisinden bir eleman seçeceğim
             selectNewColor()
+            maxScore = UserDefaults.standard.integer(forKey: "max")
+            totalGames = UserDefaults.standard.integer(forKey: "totalGames")
+
         }
     }
     
